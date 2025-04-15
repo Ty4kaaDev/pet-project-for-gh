@@ -1,13 +1,15 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/user/user.entity';
+import { User, UserJwt } from 'src/entities/user/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepository: Repository<User>,
+        private readonly jwtService: JwtService
     ) { }
 
     async createUser(name: string, lastName: string, email: string, number: string, password: string) {
@@ -30,28 +32,54 @@ export class UserService {
             [name, lastName, email, number, hashedPassword, new Date().getMilliseconds()]
         );
 
-        return user
+        return {
+            user: user,
+            token: await this.accessToken(user)
+        }
     }
 
     async login(email: string, password: string) {
-        const user = await this.userRepository.query(
+        const [user] = await this.userRepository.query(
             `SELECT * FROM "${this.userRepository.metadata.tableName}" WHERE email = $1 LIMIT 1`,
             [email]
         )
         if(!user) {
             throw new HttpException('User not found', 404);
         }
-        const isPasswordValid = await bcrypt.compare(password, user[0].password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if(!isPasswordValid) {
             throw new HttpException('Invalid password', 401);
         }
+        return {
+            user: user,
+            token: await this.accessToken(user)
+        }
+    }
+
+    async authByJwt(jwt: UserJwt) {
+        const [user] = await this.userRepository.query(
+            `SELECT * FROM "${this.userRepository.metadata.tableName}" WHERE id = $1 LIMIT 1`,
+            [jwt.id]
+        )
+
+        console.log(jwt)
+
+        if (!user) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
         return user
     }
 
-    //TODO
-    async authByJwt(user: User) {
+    accessToken(user: User): string {
+        const payload = {
+            id: user.id,
+            email: user.email,
+        };
 
+        return this.jwtService.sign(payload);
     }
+
 
     async findOneUser(key: string, value: string) {
         const validColumns = this.userRepository.metadata.columns.map(col => col.propertyName);

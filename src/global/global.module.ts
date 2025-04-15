@@ -1,9 +1,13 @@
 // app.module.ts
 import { Global, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Item } from 'src/entities/item/item.entity';
 import { User } from 'src/entities/user/user.entity';
+import { UserService } from 'src/user/user.service';
 
-const entities = [User]
+const entities = [User, Item]
 
 @Global()
 @Module({
@@ -19,7 +23,25 @@ const entities = [User]
             synchronize: true,
         }),
         TypeOrmModule.forFeature(entities),
+        ConfigModule.forRoot({
+            envFilePath: './env/.env',
+        }),
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                global: true,
+                secret: configService.get<string>('JWT_TOKEN'),
+                signOptions: {
+                    expiresIn: configService.get<string>('JWT_EXPIRES'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
     ],
-    exports: [TypeOrmModule.forFeature(entities)],
+    exports: [TypeOrmModule.forFeature(entities), ConfigModule, JwtModule],
 })
-export class GlobalModule { }
+export class GlobalModule {
+    constructor() {
+        console.log(process.env.JWT_TOKEN);
+    }
+ }

@@ -4,11 +4,13 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
 import { GlobalModule } from './global/global.module';
+import { ItemModule } from './item/item.module';
 
 @Module({
     imports: [
         GlobalModule,
-        UserModule
+        UserModule,
+        ItemModule
     ],
     controllers: [AppController],
     providers: [AppService, UserService],
