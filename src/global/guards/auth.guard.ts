@@ -51,11 +51,9 @@ export class UserGuard implements CanActivate {
         } catch {
             throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);
         }
-        
+
         const user = await this.authService.authByJwt(payload);
-        if (
-            user.role - role >= 0
-        ) {
+        if (user.role - role >= 0) {
             request['jwtPayload'] = payload;
             request['user'] = user;
             request['token'] = token;

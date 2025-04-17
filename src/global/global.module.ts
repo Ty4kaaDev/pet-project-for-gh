@@ -3,11 +3,14 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Chat } from 'src/entities/chat/chat.entity';
+import { Message } from 'src/entities/chat/message.entity';
+import { SessionEntity } from 'src/entities/chat/session.model';
 import { Item } from 'src/entities/item/item.entity';
 import { User } from 'src/entities/user/user.entity';
 import { UserService } from 'src/user/user.service';
 
-const entities = [User, Item]
+const entities = [User, Item, Chat, Message, SessionEntity];
 
 @Global()
 @Module({
@@ -44,4 +47,4 @@ export class GlobalModule {
     constructor() {
         console.log(process.env.JWT_TOKEN);
     }
- }
+}

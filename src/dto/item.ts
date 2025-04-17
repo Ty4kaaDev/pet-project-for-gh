@@ -1,20 +1,20 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateItemDTO {
     @IsString()
-    name: string
+    name: string;
 
     @IsString()
-    description: string
+    description: string;
 
     @IsNumber()
-    price: number
+    price: number;
 }
 
 export class GetItemDTO {
     @IsString()
-    key: string
+    key: string;
 
     @IsString()
-    value: string
+    value: string;
 }

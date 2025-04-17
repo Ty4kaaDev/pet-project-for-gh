@@ -1,35 +1,41 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../user/user.entity";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Item {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column()
-    name: string
+    name: string;
 
     @Column()
-    description: string
+    description: string;
 
     @Column()
-    price: number
+    price: number;
 
-    @ManyToOne(() => User) // можно указать, (user) => user.items, если добавишь @OneToMany в User
-    @JoinColumn({ name: "user_id"})
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'user_id' })
     user: User;
 
     @Column({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',
     })
-    createdat: Date
+    createdat: Date;
 
     @UpdateDateColumn({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP', // Работает не во всех СУБД
+        onUpdate: 'CURRENT_TIMESTAMP',
     })
     updated_at: Date;
-
 }

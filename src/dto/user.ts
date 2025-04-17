@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class RegisterUserDTO {
     @IsString()
@@ -11,10 +11,10 @@ export class RegisterUserDTO {
     email: string;
 
     @IsString()
-    number: string
+    number: string;
 
     @IsString()
-    password: string
+    password: string;
 }
 
 export class LoginUserDTO {
@@ -22,5 +22,5 @@ export class LoginUserDTO {
     email: string;
 
     @IsString()
-    password: string
+    password: string;
 }

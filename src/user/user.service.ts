@@ -8,17 +8,24 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UserService {
     constructor(
-        @InjectRepository(User) private readonly userRepository: Repository<User>,
-        private readonly jwtService: JwtService
-    ) { }
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+        private readonly jwtService: JwtService,
+    ) {}
 
-    async createUser(name: string, lastName: string, email: string, number: string, password: string) {
+    async createUser(
+        name: string,
+        lastName: string,
+        email: string,
+        number: string,
+        password: string,
+    ) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         if (await this.findOneUser('email', email)) {
             throw new HttpException('Email already exists', 400);
         }
-        console.log(await this.findOneUser('number', number))
+        console.log(await this.findOneUser('number', number));
         if (await this.findOneUser('number', number)) {
             throw new HttpException('Number already exists', 400);
         }
@@ -29,46 +36,53 @@ export class UserService {
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
             `,
-            [name, lastName, email, number, hashedPassword, new Date().getMilliseconds()]
+            [
+                name,
+                lastName,
+                email,
+                number,
+                hashedPassword,
+                new Date().getMilliseconds(),
+            ],
         );
 
         return {
             user: user,
-            token: await this.accessToken(user)
-        }
+            token: await this.accessToken(user),
+        };
     }
 
     async login(email: string, password: string) {
         const [user] = await this.userRepository.query(
             `SELECT * FROM "${this.userRepository.metadata.tableName}" WHERE email = $1 LIMIT 1`,
-            [email]
-        )
-        if(!user) {
+            [email],
+        );
+        if (!user) {
             throw new HttpException('User not found', 404);
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if(!isPasswordValid) {
+        if (!isPasswordValid) {
             throw new HttpException('Invalid password', 401);
         }
         return {
             user: user,
-            token: await this.accessToken(user)
-        }
+            token: await this.accessToken(user),
+        };
     }
 
     async authByJwt(jwt: UserJwt) {
         const [user] = await this.userRepository.query(
             `SELECT * FROM "${this.userRepository.metadata.tableName}" WHERE id = $1 LIMIT 1`,
-            [jwt.id]
-        )
+            [jwt.id],
+        );
 
-        console.log(jwt)
+        console.log(jwt);
 
         if (!user) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
-        return user
+        return user;
     }
 
     accessToken(user: User): string {
@@ -80,17 +94,18 @@ export class UserService {
         return this.jwtService.sign(payload);
     }
 
-
-    async findOneUser(key: string, value: string) {
-        const validColumns = this.userRepository.metadata.columns.map(col => col.propertyName);
+    async findOneUser(key: string, value: any): Promise<User> {
+        const validColumns = this.userRepository.metadata.columns.map(
+            (col) => col.propertyName,
+        );
         if (!validColumns.includes(key)) {
             throw new Error(`Invalid column name: ${key}`);
         }
 
         const [user] = await this.userRepository.query(
             `SELECT * FROM "${this.userRepository.metadata.tableName}" WHERE ${key} = $1 LIMIT 1`,
-            [value]
-        )
+            [value],
+        );
 
         return user;
     }

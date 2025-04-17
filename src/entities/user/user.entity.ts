@@ -19,7 +19,7 @@ export enum UserRole {
     BANNED = 0,
     USER = 1,
     MODERATOR = 2,
-    ADMIN = 3
+    ADMIN = 3,
 }
 
 @Entity()
@@ -30,7 +30,7 @@ export class User {
     @Column()
     name: string;
 
-    @Column({name: 'last_name'})
+    @Column({ name: 'last_name' })
     lastName: string;
 
     @Column({ unique: true })
@@ -45,7 +45,7 @@ export class User {
     @Column({
         type: 'enum',
         enum: UserRole,
-        default: UserRole.USER
+        default: UserRole.USER,
     })
     role: UserRole;
 
@@ -56,7 +56,7 @@ export class User {
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',
     })
-    createdat: Date
+    createdat: Date;
 
     @UpdateDateColumn({
         type: 'timestamp',

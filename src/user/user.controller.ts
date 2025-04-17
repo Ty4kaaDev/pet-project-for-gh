@@ -5,9 +5,7 @@ import { UserGuard, UserRequest } from 'src/global/guards/auth.guard';
 @Controller('user')
 export class UserController {
     @Get()
-    async get(
-        @Req() req: UserRequest
-    ){
-        return req.user
+    async get(@Req() req: UserRequest) {
+        return req.user;
     }
 }

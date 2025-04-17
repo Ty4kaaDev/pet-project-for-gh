@@ -7,16 +7,12 @@ export class AppController {
     constructor(private readonly appService: AppService) {}
 
     @Post('/register')
-    async register(
-        @Body() body: RegisterUserDTO 
-    ) {
+    async register(@Body() body: RegisterUserDTO) {
         return await this.appService.register(body);
     }
 
     @Post('/login')
-    async login(
-        @Body() body: LoginUserDTO
-    ) {
-        return await this.appService.login(body)
+    async login(@Body() body: LoginUserDTO) {
+        return await this.appService.login(body);
     }
 }
